@@ -1,7 +1,7 @@
-# cheatstat – Documentation (Version 4.1)
+# cheatstat – Documentation (Version 4.1.2)
 
 **Simple Statistical Functions for the Social Sciences**  
-*Author: Jürgen Leibold | Version 4.1 | March 2026 | License: MIT*
+*Author: Jürgen Leibold | Version 4.1.2 | March 2026 | License: MIT*
 
 ---
 
@@ -1300,4 +1300,4 @@ cheatstat was developed to make statistical analysis in the social sciences more
 
 ---
 
-*cheatstat Version 4.1 | Last updated: March 2026 | Author: Jürgen Leibold | License: MIT*
+*cheatstat Version 4.1.2 | Last updated: March 2026 | Author: Jürgen Leibold | License: MIT*

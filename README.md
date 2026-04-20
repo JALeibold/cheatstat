@@ -14,13 +14,10 @@
 ---
 
 > ⚠️ **WICHTIG / IMPORTANT**  
-> Diese Implementierung ist eine **Approximation** für explorative Analysen und
-> Lehrzwecke. Für wissenschaftliche Publikationen muss das vollständige
-> Survey-Design (PSU, Strata) berücksichtigt werden.  
+> Hinweis: Die implementierte Gewichtung beschränkt sich auf einfache Designgewichtung (Post-Stratifikation).
+> Komplexe Surveydesigns (PSU, Schichten) werden nicht berücksichtigt. 
 >
-> This implementation is an **approximation** for exploratory analyses and
-> teaching purposes. For scientific publications, the complete survey design
-> (PSU, Strata) must be considered.
+> Note: Simple post-stratification weighting only. Complex survey design (PSU, strata) not supported.
 
 ---
 
@@ -68,6 +65,6 @@ cs.help_cheatstat()
 
 <div align="center">
 
-*cheatstat Version 4.1 | Autor / Author: Jürgen Leibold | März / March 2026*
+*cheatstat Version 4.1.2 | Autor / Author: Jürgen Leibold | März / March 2026*
 
 </div>

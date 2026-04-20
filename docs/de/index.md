@@ -1172,6 +1172,6 @@ Gibt eine kompakte Übersicht über alle Funktionen in der Konsole aus.
 
 ---
 
-*cheatstat Version 4.1 | Autor: Jürgen Leibold | März 2026*
+*cheatstat Version 4.1.2 | Autor: Jürgen Leibold | März 2026*
 
 [🇬🇧 English Documentation](../en/index.md) | [⬆️ Zurück zur Übersicht](../../README.md)

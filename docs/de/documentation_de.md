@@ -1,7 +1,7 @@
-# cheatstat – Dokumentation (Version 4.1)
+# cheatstat – Dokumentation (Version 4.1.2)
 
 **Einfache statistische Funktionen für die Sozialwissenschaften**  
-*Autor: Jürgen Leibold | Version 4.1 | März 2026 | Lizenz: MIT*
+*Autor: Jürgen Leibold | Version 4.1.2 | März 2026 | Lizenz: MIT*
 
 ---
 
@@ -1300,4 +1300,4 @@ cheatstat wurde entwickelt, um die statistische Analyse in den Sozialwissenschaf
 
 ---
 
-*cheatstat Version 4.1 | Letzte Aktualisierung: März 2026 | Autor: Jürgen Leibold | Lizenz: MIT*
+*cheatstat Version 4.1.2 | Letzte Aktualisierung: März 2026 | Autor: Jürgen Leibold | Lizenz: MIT*

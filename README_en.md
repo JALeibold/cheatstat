@@ -366,7 +366,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 <div align="center">
 
-*cheatstat Version 4.1 | Author: Jürgen Leibold | March 2026*
+*cheatstat Version 4.1.2 | Author: Jürgen Leibold | March 2026*
 
 [⬆️ Back to top](#cheatstat) | [🇩🇪 Deutsche Dokumentation](README_de.md)
 

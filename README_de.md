@@ -369,7 +369,7 @@ Dieses Projekt ist unter der [MIT-Lizenz](LICENSE) lizenziert.
 
 *cheat
 
-stat Version 4.1 | Autor: Jürgen Leibold | März 2026*
+stat Version 4.1.2 | Autor: Jürgen Leibold | März 2026*
 
 [⬆️ Zurück nach oben](#cheatstat) | [🇬🇧 English Documentation](README_en.md)
 

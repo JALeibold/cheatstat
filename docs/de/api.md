@@ -825,6 +825,6 @@ cs.help_cheatstat()
 
 ---
 
-*cheatstat Version 4.1 | Autor: Jürgen Leibold | März 2026*
+*cheatstat Version 4.1.2 | Autor: Jürgen Leibold | März 2026*
 
 [← Beispiele](examples.md) | [← Zurück zur Übersicht](index.md)

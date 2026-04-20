@@ -1092,6 +1092,6 @@ Prints a compact overview of all functions in the console.
 
 ---
 
-*cheatstat Version 4.1 | Author: Jürgen Leibold | March 2026*
+*cheatstat Version 4.1.2 | Author: Jürgen Leibold | March 2026*
 
 [🇩🇪 Deutsche Dokumentation](../de/index.md) | [⬆️ Back to overview](../../README.md)
