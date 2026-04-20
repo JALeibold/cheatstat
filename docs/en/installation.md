@@ -620,7 +620,7 @@ pip uninstall cheatstat statsmodels numba openpyxl pyreadstat
 
 ---
 
-*cheatstat Version 4.1 | Author: Jürgen Leibold | March 2026*
+*cheatstat Version 4.1.2 | Author: Jürgen Leibold | March 2026*
 
 [→ Next: Basic Usage](usage.md) | [← Back to Overview](index.md)
 

@@ -752,7 +752,7 @@ cs.export_results(result, 'einkommensanalyse_final')
 
 ---
 
-*cheatstat Version 4.1 | Autor: Jürgen Leibold | März 2026*
+*cheatstat Version 4.1.2 | Autor: Jürgen Leibold | März 2026*
 
 [→ API-Referenz](api.md) |
 [← Grundlegende Nutzung](usage.md) |

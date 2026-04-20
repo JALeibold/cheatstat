@@ -409,7 +409,7 @@ cs.fre_wl(df_num, 'educ', df_lab)
 
 ---
 
-*cheatstat Version 4.1 | Author: Jürgen Leibold | March 2026*
+*cheatstat Version 4.1.2 | Author: Jürgen Leibold | March 2026*
 
 [→ Next: Examples](examples.md) |
 [← Installation](installation.md) |

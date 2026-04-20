@@ -717,7 +717,7 @@ sis.export_results(result, 'income_analysis_final')
 
 ---
 
-*cheatstat Version 4.1 | Author: Jürgen Leibold | March 2026*
+*cheatstat Version 4.1.2 | Author: Jürgen Leibold | March 2026*
 
 [→ API Reference](api.md) |
 [← Basic Usage](usage.md) |

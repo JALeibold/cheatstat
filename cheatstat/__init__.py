@@ -22,7 +22,7 @@ Enthält:
 - help_cheatstat(): Kurzanleitung
 
 Autor: Jürgen Leibold
-Version: 4.1
+Version: 4.2
 """
 
 import pandas as pd
@@ -79,11 +79,12 @@ class StatResult:
     Einheitlicher Container für statistische Ergebnisse.
 
     Verwendung:
-        result.summary()           → Formatierte Ausgabe
-        result.summary(show_tables=True) → inkl. Tabellen
-        result['stat']             → Statistik-DataFrame
-        result['observed']         → Tabelle per Key
-        result.keys()              → Alle verfügbaren Schlüssel
+        result                             → Automatische Ausgabe in Jupyter/Spyder (F9)
+        result.summary()                   → Formatierte Ausgabe
+        result.summary(show_tables=True)   → inkl. Tabellen
+        result['stat']                     → Statistik-DataFrame
+        result['observed']                 → Tabelle per Key
+        result.keys()                      → Alle verfügbaren Schlüssel
     """
 
     def __init__(self, tables=None, stat=None, test_name="", info=None):
@@ -121,9 +122,12 @@ class StatResult:
         print(f"{'=' * 60}\n")
 
     def __repr__(self):
-        n_tables = len(self.tables)
-        has_stat = "mit Statistiken" if self.stat is not None else "ohne Statistiken"
-        return f"StatResult('{self.test_name}', {n_tables} Tabellen, {has_stat})"
+        self.summary(show_tables=True)
+        return ""
+
+    def __str__(self):
+        self.summary(show_tables=True)
+        return ""
 
     def __getitem__(self, key):
         if key == 'stat':
@@ -590,11 +594,10 @@ def recode(df, column, mapping, new_name=None, else_value=np.nan):
     # Versuche numerischen Typ
     try:
         df[target] = pd.to_numeric(df[target], errors='coerce')
-        # Wenn alle Werte NaN oder numerisch sind, behalte numerisch
         if df[target].notna().any():
             pass
         else:
-            df[target] = result  # Fallback auf Original
+            df[target] = result
     except (ValueError, TypeError):
         pass
 
@@ -626,6 +629,7 @@ def missing_report(df, threshold=5.0):
         StatResult mit Tabelle sortiert nach Prozent fehlend
 
     Beispiel:
+        missing_report(df)
         result = missing_report(df)
         result.summary()
     """
@@ -651,7 +655,9 @@ def missing_report(df, threshold=5.0):
             "Status": flag
         })
 
-    stat_df = pd.DataFrame(rows).sort_values("% fehlend", ascending=False).reset_index(drop=True)
+    stat_df = pd.DataFrame(rows).sort_values(
+        "% fehlend", ascending=False
+    ).reset_index(drop=True)
 
     n_complete = (stat_df['n (fehlend)'] == 0).sum()
     n_problematic = (stat_df['% fehlend'] > threshold).sum()
@@ -674,7 +680,7 @@ def missing_report(df, threshold=5.0):
 
 
 # ===============================================================
-# fre – Häufigkeitstabelle (NEUE SYNTAX: df, column)
+# fre – Häufigkeitstabelle
 # ===============================================================
 
 def fre(df, column, weight=None, sort=True, round_digits=2):
@@ -720,7 +726,6 @@ def fre(df, column, weight=None, sort=True, round_digits=2):
     MisC = ["nan", "NaN", "N/A", "null", "None", ""]
     data_str = data.astype(str).replace(MisC, "Fehlend").fillna("Fehlend")
 
-    # Gewichtung auflösen
     weight_series = _validate_weight(weight, df)
 
     if weight_series is not None:
@@ -741,7 +746,9 @@ def fre(df, column, weight=None, sort=True, round_digits=2):
     HT["Häufigkeiten"] = HT["Häufigkeiten"].round(0).astype("int32")
 
     HT["__sort_value__"] = pd.to_numeric(HT["Ausprägung"], errors='coerce')
-    HT = HT.sort_values("__sort_value__", ascending=True).drop("__sort_value__", axis=1)
+    HT = HT.sort_values("__sort_value__", ascending=True).drop(
+        "__sort_value__", axis=1
+    )
 
     total = HT["Häufigkeiten"].sum()
     HT["Prozent"] = (HT["Häufigkeiten"] / total) * 100
@@ -755,7 +762,8 @@ def fre(df, column, weight=None, sort=True, round_digits=2):
     HT["gültigeP"] = validP
     HT["kum.gültigeP"] = HT["gültigeP"].cumsum()
 
-    HT = HT[["Ausprägung", "Häufigkeiten", "Prozent", "kum. Prozente", "gültigeP", "kum.gültigeP"]]
+    HT = HT[["Ausprägung", "Häufigkeiten", "Prozent",
+             "kum. Prozente", "gültigeP", "kum.gültigeP"]]
 
     for c in ["Prozent", "kum. Prozente", "gültigeP", "kum.gültigeP"]:
         HT[c] = HT[c].round(round_digits)
@@ -784,7 +792,7 @@ def fre(df, column, weight=None, sort=True, round_digits=2):
 
 
 # ===============================================================
-# fre_wl – Häufigkeitstabelle mit Labels (NEUE SYNTAX: df, column, labels_df/series)
+# fre_wl – Häufigkeitstabelle mit Labels
 # ===============================================================
 
 def fre_wl(df, column, labels, weight=None, sort_by_value=True, round_digits=2):
@@ -795,8 +803,6 @@ def fre_wl(df, column, labels, weight=None, sort_by_value=True, round_digits=2):
         df: pd.DataFrame – Datensatz mit numerischen Ausprägungen
         column: str – Spaltenname der zu analysierenden Variable
         labels: pd.DataFrame oder pd.Series – Labels
-            - pd.DataFrame: muss dieselbe Spalte enthalten (z.B. dfL['spalte'])
-            - pd.Series: wird direkt als Label-Spalte verwendet
         weight: str (Spaltenname) oder pd.Series (optional)
         sort_by_value: nach Wert sortieren (default: True)
         round_digits: Dezimalstellen (default: 2)
@@ -809,7 +815,6 @@ def fre_wl(df, column, labels, weight=None, sort_by_value=True, round_digits=2):
         fre_wl(df, 'v173', dfL, weight='gewicht')
         fre_wl(df, 'v173', dfL['v173'])
     """
-    # Validierung
     if not isinstance(df, pd.DataFrame):
         raise TypeError(
             f"Erster Parameter muss ein DataFrame sein, nicht {type(df).__name__}.\n"
@@ -828,7 +833,6 @@ def fre_wl(df, column, labels, weight=None, sort_by_value=True, round_digits=2):
             f"Vorhandene Spalten: {list(df.columns)[:20]}"
         )
 
-    # Labels auflösen
     if isinstance(labels, pd.DataFrame):
         if column not in labels.columns:
             raise ValueError(
@@ -858,20 +862,26 @@ def fre_wl(df, column, labels, weight=None, sort_by_value=True, round_digits=2):
     MisC = ["nan", "NaN", "N/A", "null", "None", ""]
     df_temp["Label"] = df_temp["Label"].astype(str).replace(MisC, "---").fillna("---")
 
-    # Gewichtung auflösen
     weight_series = _validate_weight(weight, df)
 
     if weight_series is not None:
         weighted_freq = df_temp.groupby("Ausprägung").apply(
             lambda x: weight_series.loc[x.index].sum()
         )
-        HT = pd.DataFrame({"Ausprägung": weighted_freq.index, "Häufigkeiten": weighted_freq.values})
+        HT = pd.DataFrame({
+            "Ausprägung": weighted_freq.index,
+            "Häufigkeiten": weighted_freq.values
+        })
     else:
         freq = df_temp["Ausprägung"].value_counts(dropna=False)
-        HT = pd.DataFrame({"Ausprägung": freq.index, "Häufigkeiten": freq.values})
+        HT = pd.DataFrame({
+            "Ausprägung": freq.index,
+            "Häufigkeiten": freq.values
+        })
 
     HT["Häufigkeiten"] = HT["Häufigkeiten"].round(0).astype("int32")
-    label_map = df_temp.drop_duplicates(subset="Ausprägung").set_index("Ausprägung")["Label"].to_dict()
+    label_map = (df_temp.drop_duplicates(subset="Ausprägung")
+                 .set_index("Ausprägung")["Label"].to_dict())
     HT["Label"] = HT["Ausprägung"].map(label_map).fillna("---")
 
     total = HT["Häufigkeiten"].sum()
@@ -938,6 +948,7 @@ def uniV(df, column_name, weight=None, se=False):
         StatResult mit result['fre'] und result['stats']
 
     Beispiel:
+        uniV(df, 'alter')
         result = uniV(df, 'alter')
         result.summary()
     """
@@ -950,15 +961,17 @@ def uniV(df, column_name, weight=None, se=False):
 
     weight_series = _validate_weight(weight, df)
 
-    # fre intern mit der neuen Syntax aufrufen
     fre_table = _fre_internal(df[column_name], weight=weight_series,
                                sort=False, round_digits=2)
 
     stats_table = None
     numeric_data = pd.to_numeric(df[column_name], errors='coerce')
     valid_data = numeric_data.dropna()
-    info = {"Variable": column_name, "n (gesamt)": len(df),
-            "n (gültig)": len(valid_data)}
+    info = {
+        "Variable": column_name,
+        "n (gesamt)": len(df),
+        "n (gültig)": len(valid_data)
+    }
 
     if len(valid_data) > 0:
         q25 = valid_data.quantile(0.25)
@@ -1139,8 +1152,9 @@ def cross_tab(df, col1, col2, weight=None, round_digits=2,
         StatResult mit observed, col_percent, row_percent, etc.
 
     Beispiel:
-        ct = cross_tab(df, 'sex', 'educ')
-        ct.summary(show_tables=True)
+        cross_tab(df, 'sex', 'educ')
+        result = cross_tab(df, 'sex', 'educ')
+        result.summary(show_tables=True)
     """
     if col1 not in df.columns:
         raise ValueError(f"Spalte '{col1}' nicht gefunden.")
@@ -1445,8 +1459,10 @@ def biV(df, col1, col2, scale, weight=None, round_digits=2, notable=False):
         StatResult
 
     Beispiel:
-        biV(df, 'sex', 'educ', 'nominal').summary()
-        biV(df, 'age', 'inc', 'ordinal').summary()
+        biV(df, 'sex', 'educ', 'nominal')
+        biV(df, 'age', 'inc', 'ordinal')
+        result = biV(df, 'sex', 'educ', 'nominal')
+        result.summary()
     """
     scale = _resolve_scale(scale)
 
@@ -1545,8 +1561,9 @@ def ttest_u(group, g1, g2, dependent, data=None, weight=None,
         StatResult
 
     Beispiel:
-        ttest_u(group='sex', g1=1, g2=2,
-                dependent='inc', data=df).summary()
+        ttest_u(group='sex', g1=1, g2=2, dependent='inc', data=df)
+        result = ttest_u(group='sex', g1=1, g2=2, dependent='inc', data=df)
+        result.summary()
     """
     if data is None:
         raise ValueError("data muss übergeben werden.")
@@ -1647,7 +1664,6 @@ def ttest_u(group, g1, g2, dependent, data=None, weight=None,
 
     md = mn1 - mn2
 
-    # Student-t
     dfe = ne1 + ne2 - 2
     if hw:
         sp2 = (((ne1 - 1) * v1 + (ne2 - 1) * v2) / dfe
@@ -1660,7 +1676,6 @@ def ttest_u(group, g1, g2, dependent, data=None, weight=None,
     else:
         tse, pve = ttest_ind(g1d, g2d, equal_var=True)
 
-    # Welch-t
     v1n = v1 / ne1 if ne1 > 0 else np.nan
     v2n = v2 / ne2 if ne2 > 0 else np.nan
     seu = (np.sqrt(v1n + v2n)
@@ -1696,13 +1711,11 @@ def ttest_u(group, g1, g2, dependent, data=None, weight=None,
         ts, pv, dfv = tsu, pvu, dfu
         se_used = seu
 
-    # Cohen's d
     dfp = ne1 + ne2 - 2
     psd = (np.sqrt(((ne1 - 1) * v1 + (ne2 - 1) * v2) / dfp)
            if dfp > 0 else np.nan)
     cd = md / psd if psd and psd > 0 else np.nan
 
-    # KI
     if (not np.isnan(dfv) and dfv > 0
             and se_used and se_used > 0):
         tc = stats.t.ppf(0.975, dfv)
@@ -1781,7 +1794,6 @@ def regress(formula, data, weight=None, robust=False, show_beta=True,
 
     Parameter:
         formula: str – 'y ~ x1 + x2 + ...'
-            Unterstützt: C(x) für kategorial, x1:x2 für Interaktionen
         data: pd.DataFrame
         weight: str (Spaltenname) oder None
         robust: bool – robuste SE HC3 (default: False)
@@ -1790,18 +1802,12 @@ def regress(formula, data, weight=None, robust=False, show_beta=True,
         show_vif: bool – VIF (default: True)
 
     Rückgabe:
-        StatResult mit:
-            result['stat']            → Koeffiziententabelle
-            result['model']           → statsmodels-Objekt
-            result['anova']           → ANOVA (wenn verfügbar)
-            result.summary()          → Formatierte Ausgabe
-            result['model'].summary() → Original statsmodels-Output
+        StatResult
 
     Beispiel:
-        regress('inc ~ sex + educ', data=df).summary()
-        regress('inc ~ sex + educ', data=df, weight='w').summary()
-        regress('inc ~ C(educ) + age', data=df).summary()
-        regress('inc ~ sex + educ', data=df, robust=True).summary()
+        regress('inc ~ sex + educ', data=df)
+        result = regress('inc ~ sex + educ', data=df)
+        result['model'].summary()
     """
     if not STATSMODELS_AVAILABLE:
         raise ImportError(
@@ -1846,17 +1852,14 @@ def regress(formula, data, weight=None, robust=False, show_beta=True,
     except Exception as e:
         raise ValueError(f"Modellfehler: {e}")
 
-    # Betas
     betas = {}
     if show_beta:
         betas = _calculate_betas(model, data, formula, wc)
 
-    # VIF
     vif_vals = {}
     if show_vif:
         vif_vals = _calculate_vif(model)
 
-    # Koeffiziententabelle
     conf_int = model.conf_int()
     rows = []
     for name in model.params.index:
@@ -1896,7 +1899,6 @@ def regress(formula, data, weight=None, robust=False, show_beta=True,
 
     stat_df = pd.DataFrame(rows)
 
-    # ANOVA
     try:
         anova_tbl = sm.stats.anova_lm(model, typ=2).round(4)
     except Exception:
@@ -1936,7 +1938,6 @@ def regress(formula, data, weight=None, robust=False, show_beta=True,
 
 def _calculate_betas(model, data, formula, weight_col=None):
     betas = {}
-    y_var = formula.strip().split('~')[0].strip()
     y_vals = model.model.endog
 
     if weight_col and weight_col in data.columns:
@@ -2006,7 +2007,9 @@ def beta(formula, data, weight=None, full=False):
 
     Beispiel:
         beta('inc ~ age + educ', data=df)
-        beta('inc ~ age + educ', data=df, full=True).summary()
+        beta('inc ~ age + educ', data=df, full=True)
+        result = beta('inc ~ age + educ', data=df, full=True)
+        result.summary()
     """
     parts = formula.strip().split('~')
     if len(parts) != 2:
@@ -2145,14 +2148,16 @@ def cronbach(df, items, weight=None, item_analysis=True):
     Parameter:
         df: pd.DataFrame
         items: list – Spaltennamen der Items
-        weight: str oder pd.Series (optional) – derzeit nur ungewichtet
+        weight: str oder pd.Series (optional)
         item_analysis: bool – Item-Total-Korrelationen (default: True)
 
     Rückgabe:
         StatResult
 
     Beispiel:
-        cronbach(df, ['item1', 'item2', 'item3', 'item4']).summary()
+        cronbach(df, ['item1', 'item2', 'item3', 'item4'])
+        result = cronbach(df, ['item1', 'item2', 'item3', 'item4'])
+        result.summary()
     """
     missing_items = [i for i in items if i not in df.columns]
     if missing_items:
@@ -2282,8 +2287,6 @@ def effect_size(test_type, **kwargs):
             "Wert": f"{d:.4f}",
             "Bewertung": rat
         })
-
-        # Zusätzlich: r aus d
         r_from_d = d / np.sqrt(d ** 2 + 4)
         rows.append({
             "Maß": "r (aus d)",
@@ -2406,7 +2409,9 @@ def normality_test(df, column):
         StatResult
 
     Beispiel:
-        normality_test(df, 'inc').summary()
+        normality_test(df, 'inc')
+        result = normality_test(df, 'inc')
+        result.summary()
     """
     from scipy.stats import shapiro, kstest
 
@@ -2507,7 +2512,9 @@ def compare_groups(df, group, variables, weight=None):
         StatResult
 
     Beispiel:
-        compare_groups(df, 'sex', ['inc', 'age', 'educ']).summary()
+        compare_groups(df, 'sex', ['inc', 'age', 'educ'])
+        result = compare_groups(df, 'sex', ['inc', 'age', 'educ'])
+        result.summary()
     """
     if group not in df.columns:
         raise ValueError(
@@ -2692,11 +2699,11 @@ def help_cheatstat():
     """Kurzanleitung für alle Funktionen."""
     print("""
     ╔══════════════════════════════════════════════════════════════╗
-    ║  cheatstat v4.1 – Kurzanleitung                             ║
+    ║  cheatstat v4.2 – Kurzanleitung                             ║
     ╠══════════════════════════════════════════════════════════════╣
     ║                                                              ║
     ║  FEHLENDE WERTE:                                             ║
-    ║    missing_report(df).summary()                              ║
+    ║    missing_report(df)                                        ║
     ║                                                              ║
     ║  UMKODIEREN:                                                 ║
     ║    df = recode(df, 'var', {'1,2': 1, '3-6': 2, '>6': 3})   ║
@@ -2711,48 +2718,48 @@ def help_cheatstat():
     ║    fre_wl(df, 'var', dfL, weight='gewicht')                  ║
     ║                                                              ║
     ║  DESKRIPTIVE STATISTIK:                                      ║
-    ║    uniV(df, 'var').summary()                                 ║
-    ║    uniV(df, 'var', weight='w').summary()                     ║
+    ║    uniV(df, 'var')                                           ║
+    ║    uniV(df, 'var', weight='w')                               ║
     ║                                                              ║
     ║  KREUZTABELLE:                                               ║
-    ║    cross_tab(df, 'v1', 'v2').summary(show_tables=True)      ║
+    ║    cross_tab(df, 'v1', 'v2')                                 ║
     ║                                                              ║
     ║  ZUSAMMENHANG (bivariat):                                    ║
-    ║    biV(df, 'x', 'y', 'nominal').summary()                   ║
-    ║    biV(df, 'x', 'y', 'ordinal').summary()                   ║
+    ║    biV(df, 'x', 'y', 'nominal')                             ║
+    ║    biV(df, 'x', 'y', 'ordinal')                             ║
     ║                                                              ║
     ║  T-TEST:                                                     ║
     ║    ttest_u(group='sex', g1=1, g2=2,                          ║
-    ║            dependent='inc', data=df).summary()               ║
+    ║            dependent='inc', data=df)                         ║
     ║                                                              ║
     ║  REGRESSION (OLS mit Beta):                                  ║
-    ║    regress('y ~ x1 + x2', data=df).summary()                ║
-    ║    regress('y ~ C(educ) + age', data=df).summary()           ║
-    ║    regress('y ~ x1 + x2', data=df, weight='w').summary()    ║
-    ║    regress('y ~ x1', data=df, robust=True).summary()        ║
+    ║    regress('y ~ x1 + x2', data=df)                          ║
+    ║    regress('y ~ C(educ) + age', data=df)                     ║
+    ║    regress('y ~ x1 + x2', data=df, weight='w')              ║
+    ║    regress('y ~ x1', data=df, robust=True)                  ║
+    ║    result = regress('y ~ x1', data=df)                      ║
     ║    result['model'].summary()  # statsmodels-Original         ║
     ║                                                              ║
     ║  BETA (nur Koeffizienten):                                   ║
     ║    beta('y ~ x1 + x2', data=df)                             ║
-    ║    beta('y ~ x1 + x2', data=df, full=True).summary()        ║
+    ║    beta('y ~ x1 + x2', data=df, full=True)                  ║
     ║                                                              ║
     ║  CRONBACH'S ALPHA:                                           ║
-    ║    cronbach(df, ['i1','i2','i3','i4']).summary()             ║
+    ║    cronbach(df, ['i1','i2','i3','i4'])                       ║
     ║                                                              ║
     ║  EFFEKTSTÄRKEN:                                              ║
     ║    effect_size('cohen_d', m1=50, m2=45,                      ║
-    ║                sd1=10, sd2=12).summary()                     ║
-    ║    effect_size('eta_sq', f=4.5, df1=2, df2=97).summary()    ║
-    ║    effect_size('r_to_d', r=0.3).summary()                   ║
-    ║    effect_size('d_to_r', d=0.5).summary()                   ║
-    ║    effect_size('odds_ratio', a=30, b=10,                     ║
-    ║                c=20, d=40).summary()                         ║
+    ║                sd1=10, sd2=12)                               ║
+    ║    effect_size('eta_sq', f=4.5, df1=2, df2=97)              ║
+    ║    effect_size('r_to_d', r=0.3)                             ║
+    ║    effect_size('d_to_r', d=0.5)                             ║
+    ║    effect_size('odds_ratio', a=30, b=10, c=20, d=40)        ║
     ║                                                              ║
     ║  NORMALVERTEILUNG:                                           ║
-    ║    normality_test(df, 'var').summary()                       ║
+    ║    normality_test(df, 'var')                                 ║
     ║                                                              ║
     ║  GRUPPENVERGLEICH (deskriptiv):                              ║
-    ║    compare_groups(df, 'sex', ['inc','age']).summary()        ║
+    ║    compare_groups(df, 'sex', ['inc','age'])                  ║
     ║                                                              ║
     ║  EXPORT:                                                     ║
     ║    export_results(result, 'dateiname')                       ║
@@ -2766,10 +2773,11 @@ def help_cheatstat():
     ║    *** p < .001  |  ** p < .01  |  * p < .05  |  n.s.       ║
     ║                                                              ║
     ║  ERGEBNISSE ABRUFEN:                                         ║
-    ║    result.summary()                     # Übersicht          ║
-    ║    result.summary(show_tables=True)     # mit Tabellen       ║
-    ║    result['stat']                       # Statistik-Tabelle  ║
-    ║    result.keys()                        # Alle Schlüssel     ║
+    ║    result = uniV(df, 'var')     # speichern                  ║
+    ║    result.summary()             # erneut ausgeben            ║
+    ║    result.summary(show_tables=True)                          ║
+    ║    result['stat']               # Statistik-Tabelle          ║
+    ║    result.keys()                # Alle Schlüssel             ║
     ║                                                              ║
     ║  HILFE:                                                      ║
     ║    help_cheatstat()                                          ║
